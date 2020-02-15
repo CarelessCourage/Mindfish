@@ -28,6 +28,8 @@ export default {
 </script>
 
 <style>
+@import url("https://fonts.googleapis.com/css?family=Nunito:400,700");
+
 * {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
@@ -37,6 +39,7 @@ export default {
   user-select: none;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
+
 .sunrise {
   position: absolute;
   top: 0px;
@@ -45,12 +48,20 @@ export default {
   height: 600px;
 }
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-family: "Nunito", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+p {
+  font-family: "Nunito", Helvetica, Arial, sans-serif;
+}
+
+h1,
+h2 {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
 }
 html {
   background-color: black;
