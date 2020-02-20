@@ -72,27 +72,34 @@ body {
   width: 60%;
   margin: auto;
 }
+
 button {
+  width: 25em;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  background-color: rgba(00, 00, 00, 00);
+}
+
+button div{
+  margin: auto;
   position: relative;
   border-radius: 2em;
   padding: 1.5em;
   width: 9em;
   background-color: rgb(255, 255, 255);
-  border: none;
   font-size: 2em;
   overflow: hidden;
-  outline: none;
-  cursor: pointer;
   transition: 0.4s ease-out;
 }
 
-button:hover {
+button:hover div {
   width: 6em;
   background-color: rgba(255, 255, 255, 0);
   border-radius: 0.2em;
 }
 
-button:focus {
+button:focus div {
   width: 5em;
   background-color: rgba(255, 255, 255, 0);
   border-radius: 5em;

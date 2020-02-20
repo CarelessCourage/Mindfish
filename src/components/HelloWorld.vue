@@ -1,25 +1,68 @@
 <template>
   <div class="root">
+
+    <!-- ====== Menu ====== -->
     <div class="menu" :class="{open: menu}">
-      <div class="redPoint" @click="menu = !menu">
-        <div class="counter">22</div>
+      <div class="burger" @click="menu = !menu">
+        <div class="counter" v-if="cart.orders > 0"><p>{{cart.orders}}</p></div>
       </div>
 
-      <transition name="slide" mode="out-in">
+      <transition name="zzz" mode="out-in">
         <div class="grid" v-if="menu">
+          <transition appear name="xxx" mode="out-in">
+            <div class="profileBar" v-if="menu">
+              <div class="ball">
+                <svg
+                  version="1.1"
+                  id="smileSVG"
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  x="0px"
+                  y="0px"
+                  viewBox="0 0 47.5 11.4"
+                  style="enable-background:new 0 0 47.5 11.4;"
+                  xml:space="preserve"
+                >
+                  <title>Asset 7</title>
+                  <path
+                    class="st3"
+                    d="M4.6,6.2V2.3C4.7,1,3.7-0.1,2.4-0.1S0.1,0.7,0,2c0,0.1,0,0.2,0,0.3v3.9c-0.1,1.3,0.9,2.4,2.1,2.4 s2.4-0.9,2.4-2.1C4.6,6.4,4.6,6.3,4.6,6.2z"
+                  />
+                  <path
+                    class="st3"
+                    d="M47.5,6.2V2.3c0.2-1.3-0.7-2.4-1.9-2.6c-1.3-0.2-2.4,0.7-2.6,1.9c0,0.2,0,0.5,0,0.7v3.9 c-0.1,1.3,0.9,2.4,2.1,2.4c1.3,0.1,2.4-0.9,2.4-2.1C47.6,6.4,47.6,6.3,47.5,6.2L47.5,6.2z"
+                  />
+                  <path
+                    class="st3"
+                    d="M23.8,11.3c3.1,0,6.1-1.3,8.2-3.7c0.7-1,0.5-2.5-0.5-3.2c-0.9-0.6-2.1-0.6-2.9,0.2c-1.2,1.4-3,2.1-4.8,2.1 c-1.8,0-3.6-0.8-4.8-2.1c-0.9-0.9-2.4-0.8-3.3,0.1c-0.8,0.8-0.8,2-0.2,2.9C17.6,10,20.6,11.4,23.8,11.3z"
+                  />
+                </svg>
+              </div>
+              <p>Become a Member</p>
+            </div>
+          </transition>
+
+          <transition appear name="delayDetails" mode="out-in">
+            <ul v-if="menu">
+              <li>Adress</li>
+              <li>Payment</li>
+            </ul>
+          </transition>
+
           <transition-group tag="div" name="list" mode="out-in" class="container">
             <div class="entry" v-for="entry in itemsInCart" v-bind:key="entry.id">
               <div class="counter" v-if="entry.orders > 0">
                 <input type="number" v-model="entry.orders" :max="99" />
               </div>
+              <div class="invisible--interact">
+                <div @click="entry.orders = entryOrder(entry.orders, 1); cartCalc(entry.orders)"></div>
+                <div @click="entry.orders = entryOrder(entry.orders, -1); cartCalc(entry.orders)"></div>
+              </div>
               <div class="info">
-                <div class="info_icon" @click="entry.orders --">
-                  <p>del</p>
-                </div>
-                <div class="into_text" @click="entry.orders ++">
-                  <h3>Name of very nice dish</h3>
-                  <p>Sushi is nice. Very nice cool. Should taste well. Does taste well. Buy again soon... bitch</p>
-                  <p>245kr</p>
+                <div class="info_text">
+                  <h3>{{entry.name}}</h3>
+                  <p>{{entry.bio}}</p>
+                  <p>{{entry.value}}kr</p>
                 </div>
               </div>
               <div class="image" :style="entry.css"></div>
@@ -28,12 +71,25 @@
               </div>
             </div>
           </transition-group>
+
+          <transition appear name="delay" mode="out-in">
+            <div class="payBar" v-if="menu">
+                <p>{{cart.value}} kr</p>
+              <p>Order<p/>
+            </div>
+          </transition>
+
         </div>
       </transition>
+      <div></div>
     </div>
+
+    <!-- ====== OFF // Fancy flavor text ====== -->
 
     <h2 id="one" v-if="false">Read my mind</h2>
     <h2 id="two" v-if="false">Sushi is nice</h2>
+
+    <!-- ====== Logo ====== -->
 
     <div class="shape" @click="list = !list">
       <svg
@@ -64,8 +120,11 @@
     </div>
     <h1 id="name">mindfish</h1>
 
+    <!-- ====== Filter Bar ====== -->
+
     <div class="categories main">
-      <div @click="category.position = 'transform: translate(0%);'; category.name='Sides'">
+      <p :class="{openFilter: filter.type === `sub`}" @click="filter.type = `main`">Menu</p>
+      <div :class="{closeFilter: filter.type === `sub`}" @click="category.position = 'transform: translate(0%);'; category.name='Sides'; subcategory.name='none'">
         <svg
           version="1.1"
           id="sidesSVG"
@@ -199,7 +258,7 @@
         <p>sides</p>
       </div>
 
-      <div @click="category.position = 'transform: translate(100%);'; category.name='Sushi'">
+      <div :class="{closeFilter: filter.type === `sub`}" @click="category.position = 'transform: translate(100%);'; category.name='Sushi'; subcategory.name='none'">
         <svg
           version="1.1"
           id="sushiSVG"
@@ -295,7 +354,7 @@
         <p>sushi</p>
       </div>
 
-      <div @click="category.position = 'transform: translate(200%);'; category.name='Drinks'">
+      <div :class="{closeFilter: filter.type === `sub`}" @click="category.position = 'transform: translate(200%);'; category.name='Drinks'; subcategory.name='none'">
         <svg
           version="1.1"
           id="drinksSVG"
@@ -334,7 +393,7 @@
         <p>drinks</p>
       </div>
 
-      <div id="selector">
+      <div :class="{closeFilter: filter.type === `sub`}" id="selector">
         <div
           id="triangle"
           v-bind:class="{ active: category.name == 'Sushi' }"
@@ -343,37 +402,217 @@
       </div>
     </div>
 
+    <!-- ====== Subfilter Bar ====== -->
+
     <transition name="down" mode="out-in">
       <div class="categories sub" v-if="category.name == `Sushi`">
-        <div @click="subcategory.position = 'transform: translate(0%);'; subcategory.name='Nigiri'">
+        <p :class="{openFilter: filter.type === `main`}" @click="filter.type = `sub`">More</p>
+
+        <div :class="{closeFilter: filter.type === `main`}" @click="subcategory.position = 'transform: translate(0%);'; subcategory.name='Nigiri'">
+          <svg
+            version="1.1"
+            id="sushiSVG"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            x="0px"
+            y="0px"
+            viewBox="0 0 59.9 35.5"
+            style="enable-background:new 0 0 59.9 35.5;"
+            xml:space="preserve"
+          >
+            <title>Asset 3</title>
+            <path
+              class="st5"
+              d="M2,21.5C2,11,13.6,8.5,24.9,8.5S47.8,11,47.8,21.5S36.2,34.6,24.9,34.6S2,32.1,2,21.5z"
+            />
+            <path
+              class="st6"
+              d="M24.9,8.5C14.6,8.5,4,10.5,2.2,18.9c0.8,0.1,1.5,0.2,2.3,0.2c0.8,0,1.8,0,2.9-0.1c1.6-0.1,3.4-0.4,5.2-0.6
+            c1.2-0.1,2.4-0.3,3.6-0.4c2.9-0.4,5.7-0.5,8.6-0.6c2.9,0,5.8,0.2,8.6,0.6c1.2,0.1,2.4,0.3,3.6,0.4c1.9,0.2,3.7,0.5,5.2,0.6l0,0
+            c0.2,0,0.4,0.2,0.5,0.4c0,0.1,0,0.2,0.1,0.2c0.7,2.4,2.2,4.5,4.2,5.9c0.4-1.3,0.7-2.6,0.7-4C47.8,11,36.2,8.5,24.9,8.5z"
+            />
+            <path
+              class="st7"
+              d="M58.9,14.3c-1-1.9-2.7-3.3-4.8-3.8c-2.3-0.7-4.8-0.1-6.6,1.4c-1.5,1.9-1.9,4.4-1.2,6.7c0.6,2.1,2,3.8,4,4.7
+            c0.4,0.2,0.9,0,1.1-0.3c1.1-1.8,1.4-4.1,0.7-6.1c-0.1-0.2-0.1-0.4-0.2-0.6l0.7,0.2c2.1,0.6,4.3,0.2,6-1
+            C59,15.1,59.1,14.7,58.9,14.3z"
+            />
+            <path
+              class="st7"
+              d="M7.2,4.1c-4.7,2.5-6.3,6.1-6.3,9.7c0,1.8,2.5,2,6.3,1.6L10,7.7L7.2,4.1z"
+            />
+            <path
+              class="st8"
+              d="M42.7,4.1L42.7,4.1l-3.3,3.5l3.3,7.8c3.8,0.3,6.3,0.1,6.3-1.6C49,10.2,47.3,6.6,42.7,4.1z"
+            />
+            <path
+              class="st7"
+              d="M42.7,4.1L42.7,4.1c-3.2-1.6-6.6-2.5-10.1-2.8l0,0l-3,5.3l4.3,7.8c3.2,0.4,6.3,0.8,8.7,1
+            C44.1,11.8,44.1,7.8,42.7,4.1z"
+            />
+            <path
+              class="st8"
+              d="M32.6,1.3L32.6,1.3c-2.5-0.3-5.1-0.4-7.7-0.4l-4.7,7.6l4.7,5.4c3,0,6,0.2,9,0.6C36.9,7.8,32.6,1.3,32.6,1.3z"
+            />
+            <path
+              class="st7"
+              d="M17.2,1.3L17.2,1.3L10,7.7l5.9,6.8c3-0.4,6-0.6,9-0.6v-13C22.4,0.9,19.8,1,17.2,1.3z"
+            />
+            <path
+              class="st8"
+              d="M17.2,1.3c0,0-4.2,6.5-1.3,13.1c-3.2,0.4-6.3,0.8-8.7,1c-1.4-3.6-1.4-7.7,0-11.3l0,0
+            C10.3,2.6,13.7,1.6,17.2,1.3z"
+            />
+            <path
+              class="st9"
+              d="M17.6,23v-1.5c0.1-0.5-0.3-0.9-0.8-1c-0.5-0.1-0.9,0.3-1,0.8c0,0.1,0,0.1,0,0.2V23c-0.1,0.5,0.3,0.9,0.8,1
+            c0.5,0.1,0.9-0.3,1-0.8C17.6,23.1,17.6,23.1,17.6,23z"
+            />
+            <path
+              class="st9"
+              d="M34,23v-1.5c0.1-0.5-0.3-0.9-0.8-1c-0.5-0.1-0.9,0.3-1,0.8c0,0.1,0,0.1,0,0.2V23c-0.1,0.5,0.3,0.9,0.8,1
+            c0.5,0.1,0.9-0.3,1-0.8C34,23.1,34,23.1,34,23z"
+            />
+            <path
+              class="st9"
+              d="M24.9,25c1.2,0,2.4-0.5,3.1-1.4c0.3-0.4,0.3-0.9-0.1-1.2c0,0,0,0,0,0c-0.4-0.3-0.9-0.3-1.2,0.1
+            c-0.9,1-2.5,1.1-3.5,0.1c0,0-0.1-0.1-0.1-0.1c-0.4-0.3-0.9-0.3-1.2,0c-0.3,0.3-0.3,0.8-0.1,1.1C22.6,24.5,23.7,25,24.9,25z"
+            />
+            <path
+              class="st9"
+              d="M2.2,16.2c-0.8,1.7-1.2,3.5-1.1,5.3c-0.1,3.8,1.7,7.4,4.8,9.6c0.3,0.3,0.9,0.3,1.2,0s0.3-0.9,0-1.2
+            C7,29.8,7,29.7,6.9,29.7c-2.6-1.9-4.2-4.9-4.1-8.2c0-1.8,0.4-3.5,1.3-5.1c0.7,0,1.5,0,2.4-0.1c3.2-0.2,6.3-0.7,9.5-1.1
+            c3-0.4,5.9-0.6,8.9-0.6c3,0,6,0.2,8.9,0.6c2.9,0.3,5.8,0.8,8.8,1c0.8,0.1,1.7,0.1,2.5,0.1c0,0.3,0,0.6,0.1,0.9l0,0
+            c0.2,1.6,0.9,3.1,1.8,4.4l0,0c-0.1,4.4-2.3,7.5-6.7,9.5c-3.7,1.7-8.8,2.5-15.3,2.5c-6.3,0-11.4-0.8-15-2.4c-0.5-0.2-1,0-1.2,0.5
+            c-0.2,0.5,0,1,0.5,1.2c3.9,1.7,9.1,2.5,15.7,2.5c6.8,0,12.2-0.9,16-2.6c4.5-2,7.1-5.2,7.7-9.5c0.4,0.3,0.9,0.5,1.3,0.7
+            c0.8,0.3,1.7,0,2.2-0.7c1.1-1.8,1.5-3.9,1-6c2.1,0.4,4.3-0.1,6-1.3c0.7-0.5,0.9-1.4,0.6-2.2c-1.1-2.2-3.1-3.7-5.4-4.3
+            c-1.7-0.5-3.5-0.4-5.1,0.2C48,7,45.8,4.7,43,3.4l0,0c-3.2-1.6-6.8-2.6-10.3-2.9C30.1,0.1,27.5,0,24.9,0c-2.6,0-5.2,0.1-7.8,0.4
+            C13.5,0.8,10,1.8,6.8,3.4l0,0C1.2,6.4,0,10.7,0,13.8c0,0.6,0.2,1.3,0.7,1.7C1.2,15.9,1.7,16.1,2.2,16.2z M25.8,1.8
+            c2.1,0,4.2,0.1,6.3,0.4c1.7,2.9,2.3,6.3,1.8,9.6c-0.1,0.6-0.3,1.1-0.5,1.7l0,0c-2.2-0.2-4.4-0.4-6.7-0.5h-0.9L25.8,1.8L25.8,1.8z M42,4.8c0.5,1.4,0.8,3,0.8,4.5l0,0c0.1,1.8-0.2,3.5-0.7,5.2l0,0h-0.5c-1.9-0.2-3.8-0.4-5.7-0.7l-0.7-0.1l0,0
+            c1.1-3.7,0.8-7.8-1-11.3C36.9,2.8,39.5,3.6,42,4.8z M53.9,11.4c1.8,0.4,3.4,1.6,4.3,3.3c0,0,0,0,0,0.1c-1.6,1-3.5,1.3-5.3,0.8
+            c-0.2,0-0.4-0.1-0.6-0.2c-0.5-0.2-1,0.1-1.1,0.6c-0.1,0.2-0.1,0.4,0,0.6c0.1,0.2,0.2,0.4,0.2,0.6c0.6,1.8,0.4,3.7-0.6,5.4
+            c0,0,0,0-0.1,0c-3.1-1.2-4.5-5.4-3.4-8.4l0,0C48.2,11.4,51.3,10.7,53.9,11.4L53.9,11.4z M47.6,10.7c-0.3,0.2-0.6,0.5-0.8,0.7
+            c-0.8,0.9-1.3,2.1-1.6,3.3c0,0-0.9,0-1.3-0.1l0,0l0,0c0.8-2.7,0.9-5.7,0.3-8.5l0,0C45.8,7.3,46.9,8.9,47.6,10.7L47.6,10.7z M24,13
+            h-0.2c-2,0-4,0.2-6,0.4l-1.3,0.1l0,0c-1-3.1-0.9-6.4,0.4-9.4c0.3-0.7,0.6-1.3,0.9-1.9c2.1-0.3,4.2-0.4,6.2-0.4V13z M15.6,2.4
+            C14.6,4.7,14,7.1,14,9.6c0,1.4,0.2,2.8,0.7,4.1c0,0,0,0,0,0.1c-1.9,0.2-3.9,0.5-5.8,0.7l-1.1,0.1l0,0c-0.8-2.5-1-5.1-0.5-7.7
+            c0.1-0.7,0.3-1.3,0.6-2C10.3,3.6,12.9,2.8,15.6,2.4L15.6,2.4z M5.6,6.2L5.6,6.2C5,9,5.2,11.9,6,14.6l0,0c-2.2,0.1-3.6,0-4.1-0.4
+            c-0.1-0.1-0.2-0.2-0.1-0.4C1.7,10.8,3.2,7.9,5.6,6.2L5.6,6.2z"
+            />
+          </svg>
           <div class="icon"></div>
-          <p>Nigiri</p>
         </div>
 
-        <div @click="subcategory.position = 'transform: translate(100%);'; subcategory.name='Ura'">
-          <div class="icon"></div>
-          <p>Ura maki</p>
+        <div :class="{closeFilter: filter.type === `main`}" @click="subcategory.position = 'transform: translate(100%);'; subcategory.name='Ura maki'">
+          <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 45.7 43.4" style="enable-background:new 0 0 45.7 43.4;" xml:space="preserve">
+            <title>Asset 8</title>
+            <path
+            class="st13"
+            d="M8.7,0.7H37c4.4,0,8,3.6,8,7.9v26c0,4.4-3.6,8-8,8H8.7c-4.4,0-7.9-3.6-7.9-8v-26C0.8,4.3,4.3,0.7,8.7,0.7z"/>
+            <path
+            class="st14"
+            d="M1.7,38.4c-0.2-0.4-0.4-0.7-0.5-1.1c-0.3-0.8-0.4-1.7-0.4-2.6v-26c0-4.4,3.6-7.9,7.9-7.9H37c4.4,0,8,3.6,8,8 v26c0,4.4-3.6,8-8,8H8.7c-1.3,0-2.6-0.4-3.8-1c-0.3-0.2-0.6-0.4-0.9-0.7c-0.2-0.2-0.5-0.4-0.7-0.6"/>
+            <path
+            class="st15"
+            d="M14.2,35.2c-3.1,0-5.6-2.5-5.6-5.6c0,0,0,0,0,0V13.8c0-3.1,2.5-5.6,5.6-5.6c0,0,0,0,0,0h17.2 c3.1,0,5.6,2.5,5.6,5.6v15.8c0,3.1-2.5,5.6-5.6,5.6c0,0,0,0,0,0H14.2z"/>
+            <path
+            class="st16"
+            d="M31.5,8.9c2.7,0,4.8,2.2,4.8,4.8c0,0,0,0,0,0v15.8c0,2.7-2.2,4.8-4.8,4.8c0,0,0,0,0,0H14.2 c-2.7,0-4.8-2.2-4.8-4.8c0,0,0,0,0,0V13.8c0-0.7,0.2-1.4,0.5-2.1c0.8-1.7,2.5-2.8,4.4-2.8H31.5 M31.5,7.4H14.2 c-2.5,0-4.7,1.4-5.8,3.7c-0.4,0.8-0.6,1.8-0.6,2.7v15.8c0,3.5,2.8,6.4,6.3,6.4c0,0,0,0,0,0h17.2c3.5,0,6.4-2.8,6.4-6.4V13.8 C37.8,10.3,35,7.4,31.5,7.4z"/>
+            <path
+            class="st17"
+            d="M15.6,23.2v-1.5c0-0.5-0.4-0.9-0.9-0.9c-0.5,0-0.9,0.4-0.9,0.9v1.5c0,0.5,0.4,0.9,0.9,0.9 C15.2,24.1,15.6,23.7,15.6,23.2C15.6,23.2,15.6,23.2,15.6,23.2z"/>
+            <path
+            class="st17"
+            d="M31.8,23.2v-1.5c0-0.5-0.4-0.9-0.9-0.9c-0.5,0-0.9,0.4-0.9,0.9v1.5c0,0.5,0.4,0.9,0.9,0.9 C31.4,24.1,31.8,23.7,31.8,23.2z"/>
+            <path
+            class="st17"
+            d="M22.8,25.2c1.2,0,2.4-0.5,3.2-1.4c0.3-0.4,0.3-0.9-0.1-1.2c-0.4-0.3-0.9-0.3-1.2,0.1c-0.9,1-2.5,1.1-3.5,0.1 c0,0-0.1-0.1-0.1-0.1c-0.3-0.4-0.9-0.4-1.2-0.1c-0.4,0.3-0.4,0.9-0.1,1.2C20.6,24.7,21.7,25.2,22.8,25.2z"/>
+            <path
+            class="st18"
+            d="M37.1,14c0,3.9,0,7.5,0,11.4c0-2.6-3.6-5.6-5.7-6.8c-2.4-1.4-5.2-1.6-7.9-1.9c-2-0.2-15.9-1.7-14.1-5.4 c0.8-1.7,2.6-2.8,4.5-2.8h18C34.7,8.8,36.9,11.1,37.1,14z"/>
+            <path
+            class="st19"
+            d="M36.8,14c0,3.9,0.3,7.5,0.3,11.4c0-2.6-3.9-5.6-6-6.8c-2.4-1.4-5.2-1.6-7.9-1.9c-2-0.2-15.8-1.7-14.1-5.4 c0.8-1.7,2.6-2.8,4.5-2.8h17.9C34.4,8.8,36.6,11.1,36.8,14z"/>
+          </svg>
         </div>
 
-        <div
-          @click="subcategory.position = 'transform: translate(200%);'; subcategory.name='Gunkan'"
-        >
-          <div class="icon"></div>
-          <p>Gunkan maki</p>
+        <div :class="{closeFilter: filter.type === `main`}" @click="subcategory.position = 'transform: translate(200%);'; subcategory.name='Gunkan maki'">
+          <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55.2 50.4" style="enable-background:new 0 0 55.2 50.4;" xml:space="preserve">
+            <title>Asset 9</title>
+            <path class="st20" d="M54.2,20.7v22.8c0,1.1-0.5,2.1-1.3,2.7c-1.1,0.5-2.2,1-3.3,1.4c-2.6,0.9-5.8,1.6-9.5,2
+            c-3.6,0.5-7.7,0.8-12,0.8c-8.5,0-16.3-1.1-21.5-2.8c-1.1-0.4-2.2-0.8-3.3-1.4c-0.8-0.7-1.3-1.7-1.3-2.7V20.7h0.3
+            c0.3,0.3,0.6,0.5,1,0.6c0-0.1,0-0.2,0-0.3c2.3,0.9,5.3,1.7,8.7,2.3c4.6,0.8,10,1.3,15.7,1.3c10.6,0,20-1.6,25.4-3.9H54.2z"/>
+            <path class="st21" d="M54.4,18.3c0,0.9-0.3,1.7-0.7,2.4h-0.5c0,1.1-0.9,2.1-2.1,2.1c-0.7,0-1.3-0.3-1.6-0.8c-2,0.6-4.2,1.1-6.7,1.5
+            c-0.4,0.9-1.2,1.5-2.2,1.5c-0.2,0-0.4,0-0.6-0.1V25c0,2.2-1.8,4-4,4c-1.9,0-3.5-1.3-3.9-3.1c-0.4,0.4-1,0.7-1.7,0.7
+            c-1.1,0-2.1-0.8-2.3-1.9c-0.2,0-0.4,0-0.5,0c-5.8,0-11.1-0.5-15.7-1.3c-0.3,0.7-1,1.2-1.9,1.2c-0.2,0-0.4,0-0.6-0.1
+            c-0.2,0.9-1,1.5-2,1.5c-1.1,0-2.1-0.9-2.1-2.1c0-0.1,0-0.2,0-0.3c-0.1,0-0.2,0-0.4,0c-1.1-0.2-1.9-1.2-1.9-2.4
+            c-0.4-0.2-0.7-0.4-1-0.6c-0.6-0.5-1-1.2-1.2-2c-0.3-1.8,0.9-3.5,2.7-4C3.8,14.5,4,14.2,4.2,14c-0.1-0.8,0.1-1.6,0.5-2.2
+            c0.5-0.7,1.2-1.2,2-1.5C6.8,9.7,7,9.1,7.4,8.6C8,7.7,9,7.2,10.1,7.1c0.2,0,0.4,0,0.6,0H11l0.2-0.2c0.2-1.8,1.7-3.1,3.4-3.3
+            c0.2,0,0.4,0,0.6,0c0.3,0,0.7,0,1,0.1C17,3,17.8,2.6,18.8,2.5c0.2,0,0.4,0,0.6,0c0.7,0,1.4,0.2,2,0.5c0.4-0.2,0.9-0.4,1.4-0.4
+            c0.2,0,0.3,0,0.5,0c0.6-0.9,1.6-1.5,2.7-1.7c1.5-0.2,3,0.4,4,1.6c0.2,0,0.3,0,0.5,0c0.5,0,1,0.1,1.5,0.2c0.3-0.1,0.6-0.2,0.8-0.2
+            c0.2,0,0.4,0,0.6,0c1.5,0,2.9,0.7,3.6,2c1.1,0.1,2.1,0.6,2.8,1.5c0.2-0.1,0.5-0.1,0.8-0.2h0.6c1.9-0.1,3.6,1.2,4,3
+            c2.4,0.3,4.3,2.2,4.7,4.6C52.5,13.8,54.3,15.8,54.4,18.3z"/>
+            <path class="st22" d="M16.6,6.6C16.6,6.7,16.6,6.7,16.6,6.6L16.6,6.6L16.6,6.6z"/>
+            <path class="st22" d="M18,8L18,8L18,8C18,8,18,8,18,8z"/>
+            <path class="st22" d="M30.5,6.3c0,0,0,0.1,0,0.1l0,0c0,0,0,0.1,0,0.1C30.5,6.5,30.5,6.4,30.5,6.3L30.5,6.3L30.5,6.3L30.5,6.3z"/>
+            <path class="st22" d="M16.6,6.6C16.6,6.7,16.6,6.7,16.6,6.6L16.6,6.6L16.6,6.6z"/>
+            <path class="st22" d="M18.1,8L18.1,8C18.1,8,18.1,8,18.1,8L18.1,8z"/>
+            <path class="st22" d="M29.8,3.5c0,0,0.1,0.1,0.1,0.1h-0.1C29.8,3.5,29.8,3.5,29.8,3.5z"/>
+            <path class="st22" d="M30.5,6.3c0,0,0,0.1,0,0.1l0,0c0,0,0,0.1,0,0.1C30.5,6.5,30.5,6.4,30.5,6.3L30.5,6.3L30.5,6.3L30.5,6.3z"/>
+            <path class="st22" d="M29.8,3.5c0,0,0.1,0.1,0.1,0.1h-0.1C29.8,3.5,29.8,3.5,29.8,3.5z"/>
+            <path class="st22" d="M30.5,6.3c0,0,0,0.1,0,0.1l0,0c0,0,0,0.1,0,0.1C30.5,6.5,30.5,6.4,30.5,6.3L30.5,6.3L30.5,6.3L30.5,6.3z"/>
+            <path class="st22" d="M30.5,6.3c0,0,0,0.1,0,0.1l0,0c0,0,0,0.1,0,0.1C30.5,6.5,30.5,6.4,30.5,6.3L30.5,6.3L30.5,6.3L30.5,6.3z"/>
+            <path class="st22" d="M30.5,6.3c0,0,0,0.1,0,0.1l0,0c0,0,0,0.1,0,0.1C30.5,6.5,30.5,6.4,30.5,6.3L30.5,6.3L30.5,6.3z"/>
+            <path class="st22" d="M30.5,6.3c0,0,0,0.1,0,0.1l0,0l0,0l0,0V6.3z"/>
+            <path d="M3.1,46.2c1.1,0.5,2.2,1,3.3,1.4C5.2,47.5,4,47,3.1,46.2z"/>
+            <path d="M52.8,46.2c-0.9,0.8-2.1,1.3-3.3,1.4C50.6,47.2,51.7,46.8,52.8,46.2z"/>
+            <path d="M19.4,16.6v-1.5c0.1-0.5-0.3-0.9-0.8-1c-0.5-0.1-0.9,0.3-1,0.8c0,0.1,0,0.1,0,0.2v1.5c0.1,0.5,0.5,0.8,1,0.8
+            C19,17.3,19.3,17,19.4,16.6z"/>
+            <path d="M35.6,16.6v-1.5c0.1-0.5-0.3-0.9-0.8-1c-0.5-0.1-0.9,0.3-1,0.8c0,0.1,0,0.1,0,0.2v1.5c0.1,0.5,0.5,0.8,1,0.8
+            C35.2,17.3,35.6,17,35.6,16.6z"/>
+            <path d="M26.6,18.5c1.2,0,2.3-0.5,3.1-1.4c0.3-0.4,0.3-0.9-0.1-1.2c-0.4-0.3-0.9-0.3-1.2,0.1c-0.9,1-2.4,1.1-3.4,0.2
+            c-0.1-0.1-0.1-0.1-0.2-0.2c-0.3-0.4-0.9-0.4-1.2-0.1c-0.4,0.3-0.4,0.9-0.1,1.2C24.3,18,25.4,18.5,26.6,18.5z"/>
+            <path d="M3.1,21.1c0,0.1,0,0.2,0,0.3c-0.4-0.2-0.7-0.4-1-0.6h0.2C2.6,20.8,2.8,20.9,3.1,21.1z"/>
+          </svg>
         </div>
 
-        <div
-          @click="subcategory.position = 'transform: translate(300%);'; subcategory.name='Sashimi'"
-        >
-          <div class="icon"></div>
-          <p>Sashimi</p>
+        <div :class="{closeFilter: filter.type === `main`}" @click="subcategory.position = 'transform: translate(300%);'; subcategory.name='Sashimi'">
+          <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 65.7 40.5" style="enable-background:new 0 0 65.7 40.5;" xml:space="preserve">
+            <title>Asset 12</title>
+            <path class="st23" d="M1.6,34.3c-2.9-2.2,2.8-10.8,4-12.7c2.7-4.2,6-7.9,9.9-11c9.2-7.4,20.3-10.2,32-9.8c1.6,0.1,3.8,0,3.9,2
+            c0.1,1.5-1,3-1.8,4.1c-7.5,10.9-19.3,19.4-31.5,24.3c-4.5,1.9-9.3,3-14.1,3.5C3.2,34.9,2.4,34.8,1.6,34.3z"/>
+            <path class="st24" d="M1.2,34.9c-0.8-1-0.6-2.4,0.2-4.1c1.7-3.5,5.9-7.6,7-8.8c3.9-3.9,8.4-7.2,13.3-9.7
+            c11.8-5.9,24.5-6.4,37.1-3.3c1.7,0.4,4.1,0.9,3.7,3.1c-0.2,1.6-1.8,3-2.9,4C49,26.4,34.2,32.8,19.9,35.4c-5.3,1-10.8,1.2-16.2,0.6
+            C2.8,35.9,1.9,35.5,1.2,34.9z"/>
+            <path class="st25" d="M8.4,22c7-7.2,16-12.1,25.8-14.1c4.9-1,9.9-1.2,14.9-0.8c2.5,0.2,5,0.6,7.4,1.1c1.2,0.3,2.4,0.5,3.7,0.8
+            c0.7,0.2,1.3,0.4,1.8,0.8c0.3,0.2,0.6,0.5,0.8,0.8c0.2,0.3,0.3,0.7,0.3,1.1c-0.1,1.4-0.7,2.7-1.7,3.6c-0.9,0.9-1.8,1.7-2.7,2.6
+            s-1.9,1.6-2.8,2.4s-2,1.5-3,2.2c-2,1.4-4.1,2.8-6.3,4c-2.2,1.2-4.4,2.4-6.7,3.4c-4.6,2-9.3,3.7-14.1,4.9c-4.9,1.3-9.8,2-14.8,2.2
+            l0,0c-0.5-0.1-0.8-0.5-0.8-0.9c0-0.4,0.4-0.7,0.8-0.8l0,0c4.9-0.1,9.8-0.8,14.5-2c4.8-1.1,9.5-2.7,14-4.7c2.3-1,4.5-2.1,6.6-3.2
+            c2.2-1.2,4.2-2.5,6.3-3.9c1-0.7,2-1.5,3-2.2s1.8-1.5,2.7-2.3s1.9-1.6,2.7-2.5c0.8-0.7,1.4-1.8,1.5-2.9c0-1-1.1-1.5-2.2-1.9
+            S57.5,9.3,56.3,9c-2.4-0.5-4.9-0.9-7.3-1.1c-4.9-0.5-9.9-0.3-14.7,0.6c-9.8,1.8-18.7,6.6-25.7,13.7c0,0.1-0.1,0.1-0.2,0
+            c0,0,0,0,0,0C8.3,22.1,8.3,22.1,8.4,22z"/>
+            <path class="st26" d="M49.2,7.5c0.1-0.2,0.2-0.3,0.3-0.5c0.8-1.2,1.9-2.6,1.8-4.1c-0.1-2-2.3-2-3.9-2c-11.7-0.4-22.8,2.4-32,9.8
+            c-3.9,3.1-7.2,6.8-9.9,11c-1,1.5-4.8,7.4-4.8,10.8c0,0.5,0.1,1,0.4,1.5"/>
+            <path class="st23" d="M64.6,25.7c-0.6,1.5-2.3,2.5-3.6,3.2c-12.3,7.4-27.9,10.5-42.2,9.9c-5.3-0.2-10.6-1.1-15.6-2.9
+            c-0.9-0.2-1.6-0.8-2.1-1.5C-0.8,31,8.7,25,10.8,23.7c4.5-2.9,9.5-5.1,14.8-6.4c12.5-3.2,24.8-0.9,36.2,4.7
+            C63.2,22.7,65.4,23.6,64.6,25.7z"/>
+            <path d="M23.4,28v-1.5c0.1-0.5-0.3-0.9-0.8-1s-0.9,0.3-1,0.8c0,0.1,0,0.1,0,0.2V28c0.1,0.5,0.5,0.8,1,0.8
+            C23,28.7,23.3,28.4,23.4,28z"/>
+            <path d="M39.6,28v-1.5c0.1-0.5-0.3-0.9-0.8-1s-0.9,0.3-1,0.8c0,0.1,0,0.1,0,0.2V28c0.1,0.5,0.5,0.8,1,0.8
+            C39.2,28.7,39.5,28.4,39.6,28z"/>
+            <path d="M30.6,29.9c1.2,0,2.3-0.5,3.1-1.4c0.3-0.4,0.3-0.9-0.1-1.2c-0.4-0.3-0.9-0.3-1.2,0.1c-0.9,1-2.5,1.1-3.5,0.1
+            c0,0-0.1-0.1-0.1-0.1c-0.3-0.4-0.9-0.4-1.2-0.1s-0.4,0.9-0.1,1.2C28.3,29.4,29.4,29.9,30.6,29.9z"/>
+            <path class="st27" d="M1.1,35.2c-1.9-3.4,7.7-9.4,9.7-10.7c4.5-2.9,9.5-5.1,14.8-6.5c12.5-3.1,24.8-0.9,36.2,4.7
+            c1.5,0.8,3.7,1.7,2.9,3.8C64,28,62.3,28.9,61,29.7c-12.3,7.4-27.9,10.5-42.2,9.9c-5.3-0.2-10.6-1.1-15.6-2.9"/>
+          </svg>
         </div>
 
-        <div id="selector">
+        <div :class="{closeFilter: filter.type === `main`}" id="selector">
           <div id="triangle" :style="subcategory.position"></div>
         </div>
       </div>
     </transition>
+
+    <!-- ====== Chinese SVG ====== -->
 
     <svg
       class="circle"
@@ -463,30 +702,22 @@
       />
     </svg>
 
-    <transition-group tag="div" name="list" mode="out-in" class="container">
+    <!-- ====== List as Images ====== -->
+
+    <transition-group v-if="list.type === `image`" tag="div" name="list" mode="out-in" class="container">
       <div class="entry" v-for="entry in filteredItems" v-bind:key="entry.id">
-        <div
-          class="counter"
-          v-if="entry.orders > 0"
-          @click="entry.orders = entryOrder(entry.orders, -1); cartCalc(entry.orders);"
-        >
-          <!--<input type="number" v-model="entry.orders" :max="99" />-->
-          {{entry.orders}}
+        <div class="counter" v-if="entry.orders > 0">
+          <input type="number" v-model="entry.orders" :max="99" />
+        </div>
+        <div class="invisible--interact">
+          <div @click="entry.orders = entryOrder(entry.orders, 1); cartCalc(entry.orders)"></div>
+          <div @click="entry.orders = entryOrder(entry.orders, -1); cartCalc(entry.orders)"></div>
         </div>
         <div class="info">
-          <div
-            class="info_icon"
-            @click="entry.orders = entryOrder(entry.orders, -1); cartCalc(entry.orders);"
-          >
-            <p>del</p>
-          </div>
-          <div
-            class="into_text"
-            @click="entry.orders = entryOrder(entry.orders, 1); cartCalc(entry.orders);"
-          >
-            <h3>Name of very nice dish</h3>
-            <p>Sushi is nice. Very nice cool. Should taste well. Does taste well. Buy again soon... bitch</p>
-            <p>245kr</p>
+          <div class="info_text">
+            <h3>{{entry.name}}</h3>
+            <p>{{entry.bio}}</p>
+            <p>{{entry.value}}kr</p>
           </div>
         </div>
         <div class="image" :style="entry.css"></div>
@@ -496,13 +727,45 @@
       </div>
     </transition-group>
 
+    <!-- ====== List as list ====== -->
+
+    <transition-group v-if="list.type === `list`" tag="div" name="list" mode="out-in" class="containerList">
+      <div class="list__entry" v-for="entry in filteredItems" v-bind:key="entry.id">
+        <div class="counter" v-if="entry.orders > 0">
+          <input type="number" v-model="entry.orders" :max="99" />
+        </div>
+        <div class="content list__open" @click="entry.orders = entryOrder(entry.orders, 1); cartCalc(entry.orders)">
+          <p>{{entry.name}}</p>
+        </div>
+        <p @click="entry.orders = entryOrder(entry.orders, -1); cartCalc(entry.orders)">{{entry.value}}kr</p>
+        <div class="list_info">
+          <p>{{entry.bio}}</p>
+          <div class="image" :style="entry.css"></div>
+        </div>
+      </div>
+    </transition-group>
+
+    <!-- ====== Call to Action ====== -->
+
     <button type="button" @click="menu = !menu">
-      <p>enter</p>
-      <p>click</p>
-      <p>bestill</p>
+      <div>
+        <p>enter</p>
+        <p>click</p>
+        <p>bestill</p>
+      </div>
     </button>
 
+    <!-- ====== Quote ====== -->
+
     <p class="quote">uiuiguiguyguktg ui tguit7t787 78 o87 t87 t8 f86t 78t78t87t87</p>
+
+    <!-- ====== Layout Change ====== -->
+
+    <div class="layout__container">
+      <div v-if="list.type === `image`" id="layout__list" @click="list.type = `list`"></div>
+      <div v-if="list.type === `list`" id="layout__images" @click="list.type = `image`"></div>
+    </div>
+
   </div>
 </template>
 
@@ -512,14 +775,14 @@ export default {
   computed: {
     filteredItems: function() {
       return this.items.filter(item => {
-        if (this.subcategory.name.length > 0) {
-          if (item.subtype === this.subcategory.name) {
+        if (this.subcategory.name === "none") {
+          if (item.type === this.category.name) {
             return true;
           } else {
             return false;
           }
         } else {
-          if (item.type === this.category.name) {
+          if (item.subtype === this.subcategory.name) {
             return true;
           } else {
             return false;
@@ -540,7 +803,14 @@ export default {
   data: function() {
     return {
       menu: false,
-      list: true,
+      filter: {
+        status: true,
+        type: "main"
+      },
+      list: {
+        status: true,
+        type: "image"
+      },
       cart: {
         orders: 0,
         value: 0
@@ -550,7 +820,7 @@ export default {
         position: "margin: auto;"
       },
       subcategory: {
-        name: "",
+        name: "none",
         position: ""
       },
       items: [
@@ -558,165 +828,462 @@ export default {
           id: 1,
           type: "Sushi",
           subtype: "Nigiri",
-          name: "yeah!",
+          name: "Sake",
+          bio: "Laks",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/200/300)"
+          value: 69,
+          css: "background-image: url(https://previews.123rf.com/images/ritablue/ritablue1909/ritablue190900003/129539098-salmon-nigiri-sushi-on-wooden-plate-japanese-food.jpg)"
         },
         {
           id: 2,
           type: "Sushi",
           subtype: "Nigiri",
-          name: "Cool",
+          name: "Maguro",
+          bio: "Tunfisk",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/300/600)"
+          value: 84,
+          css: "background-image: url(https://st3.depositphotos.com/2066681/18359/i/1600/depositphotos_183593306-stock-photo-tuna-nigiri-sushi-restaurant-table.jpg)"
         },
         {
           id: 3,
           type: "Sushi",
           subtype: "Nigiri",
-          name: "Dudes need hugs",
+          name: "Ohio",
+          bio: "Kveite",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/200/700)"
+          value: 99,
+          css: "background-image: url(https://www.leroyseafood.com/imagevault/publishedmedia/cpykeqmvj8ifbpvrkrl7/Sushi_nigiri_laks_og_kveite_6.jpg)"
         },
         {
           id: 4,
           type: "Sushi",
           subtype: "Nigiri",
-          name: "yeah!",
+          name: "Tako",
+          bio: "Blekksprut",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/700/300)"
+          value: 73,
+          css: "background-image: url(https://c8.alamy.com/comp/CRJB91/squid-sushi-one-tako-nigiri-CRJB91.jpg)"
+        },
+        {
+          id: 46,
+          type: "Sushi",
+          subtype: "Nigiri",
+          name: "Kingfish Hamachi",
+          bio: "Yellow tail",
+          orders: 0,
+          value: 115,
+          css: "background-image: url(https://media-cdn.tripadvisor.com/media/photo-s/10/a0/32/25/nigiri-dinner-tuna-salmon.jpg)"
         },
         {
           id: 5,
           type: "Sushi",
           subtype: "Nigiri",
-          name: "Cool",
+          name: "Ebi",
+          bio: "Kokt scampi",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/00/300)"
+          value: 89,
+          css: "background-image: url(https://lh3.googleusercontent.com/proxy/m8EdvjQEf3WToehbA07qA4anFUwjvqUNo-dtG8MzTVseoC0IpD6sLEOWtG7yuAulZH4ZBVJya5t6Hm8pP-t0z-YKvYbmL6RmjbSBZM8ruW3P62CTPkfnsFSIWR4aeVIUV1hm3oLOVZcA75CTtxY)"
         },
         {
           id: 6,
           type: "Sushi",
           subtype: "Nigiri",
-          name: "Dudes need hugs",
+          name: "Kuzira",
+          bio: "Hval",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/900/300)"
+          value: 69,
+          css: "background-image: url(https://i.pinimg.com/originals/86/86/99/8686992e00e3a358378a7c4f7741678b.jpg)"
         },
         {
           id: 7,
           type: "Sushi",
           subtype: "Nigiri",
-          name: "yeah!",
+          name: "Hotate",
+          bio: "Kamskjell",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/500/300)"
+          value: 105,
+          css: "background-image: url(https://images.mediabakery.com/FCL/GUY/FCL0097143-preview-logo-watermarked.jpg)"
         },
         {
           id: 8,
           type: "Sushi",
           subtype: "Nigiri",
-          name: "Cool",
+          name: "Kani",
+          bio: "Kongekrabbe",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/600/400)"
+          value: 129,
+          css: "background-image: url(https://s3-media1.fl.yelpcdn.com/bphoto/i0P0DJ1cCayik_UFDVNwZg/o.jpg)"
         },
         {
           id: 9,
           type: "Sushi",
           subtype: "Nigiri",
-          name: "Water Closet",
+          name: "Unagi",
+          bio: "Ål",
           orders: 0,
-          value: 150,
-          css:
-            "background-image: url(https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/176832f2-61bc-49c7-8ec8-08626160ae8b/dbxhck0-8bf9d21a-d262-4f62-9ea4-a55b9f83f825.png/v1/fill/w_1024,h_768,q_80,strp/sam_cam_by_samuelmb_dbxhck0-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NzY4IiwicGF0aCI6IlwvZlwvMTc2ODMyZjItNjFiYy00OWM3LThlYzgtMDg2MjYxNjBhZThiXC9kYnhoY2swLThiZjlkMjFhLWQyNjItNGY2Mi05ZWE0LWE1NWI5ZjgzZjgyNS5wbmciLCJ3aWR0aCI6Ijw9MTAyNCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.1HZBXYxOsB4pWtczCUBWq767R6FIu6mtOop_ZLQTt9c"
+          value: 109,
+          css: "background-image: url(https://image.shutterstock.com/image-photo/nigiri-sushi-sweet-eal-600w-746502550.jpg)"
         },
         {
           id: 10,
-          type: "Drinks",
+          type: "Sushi",
           subtype: "Nigiri",
-          name: "Cool",
+          name: "Ise Ebi",
+          bio: "Hummer",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/600/400)"
+          value: 139,
+          css: "background-image: url(https://lh3.googleusercontent.com/proxy/qnZVyngWKyO8h3yHHiwQQIVfrUmT6FQDuE-RUkYJaKefUjI0LKSjzlX07O96VQRF-ch9Wp8BawvDtbyl0Muqhhe-6HkBcEeCSWUJVJGyte0Pxxt3QtZA4vI0sUJCciPeC9dHac3TX0_Mow)"
         },
         {
           id: 11,
-          type: "Drinks",
+          type: "Sushi",
           subtype: "Nigiri",
-          name: "Cool",
+          name: "Ama Ebi",
+          bio: "Rå reke",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/600/400)"
+          value: 79,
+          css: "background-image: url(https://images.eatsmarter.com/sites/default/files/styles/facebook/public/nigiri-sushi-with-shrimp-or-salmon-523350.jpg)"
         },
         {
           id: 12,
-          type: "Drinks",
+          type: "Sushi",
           subtype: "Nigiri",
-          name: "Cool",
+          name: "Kaki",
+          bio: "Østers",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/600/400)"
+          value: 79,
+          css: "background-image: url(https://pbs.twimg.com/media/DtodqObV4AIMVwz.jpg)"
         },
         {
           id: 13,
-          type: "Drinks",
+          type: "Sushi",
           subtype: "Nigiri",
-          name: "Cool",
+          name: "MahiMahi",
+          bio: "Gullmakrell",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/600/400)"
+          value: 79,
+          css: "background-image: url(https://res.cloudinary.com/fleetnation/image/private/c_fit,w_1120/g_south,l_text:style_gothic2:%C2%A9%20Image%20Professionals%20GmbH,o_20,y_10/g_center,l_watermark4,o_25,y_50/v1501581892/dp6tpmibld7e9goh32ou.jpg)"
         },
         {
           id: 14,
-          type: "Drinks",
+          type: "Sushi",
           subtype: "Nigiri",
-          name: "Cool",
+          name: "Toro",
+          bio: "Fet tunfisk",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/600/400)"
+          value: 129,
+          css: "background-image: url(https://dimsunsushi.pl/183-product_img/nigiri-sake-3-pcs.jpg)"
         },
         {
           id: 15,
-          type: "Drinks",
+          type: "Sushi",
           subtype: "Nigiri",
-          name: "Cool",
+          name: "Toothfish",
+          bio: "Tannfisk",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/600/400)"
+          value: 109,
+          css: "background-image: url(https://thepursuitoffoodperfection.files.wordpress.com/2015/11/sokyo_salmonaburi.jpg)"
         },
         {
           id: 16,
-          type: "Sides",
+          type: "Sushi",
           subtype: "Nigiri",
-          name: "Cool",
+          name: "Suzuki",
+          bio: "Havabbor",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/600/400)"
+          value: 84,
+          css: "background-image: url(https://jakosushi.no/wp-content/uploads/2018/04/85399_4._Medium_sushi__12_biter__8_nigiri___4_maki_1.jpg)"
         },
         {
           id: 17,
-          type: "Sides",
-          subtype: "Nigiri",
-          name: "Cool",
+          type: "Sushi",
+          subtype: "Ura maki",
+          name: "Rispy spicy tuna",
+          bio: "Frityrstekt i panco, tunfisk, agurk, chilimajones og sesamolje",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/600/400)"
+          value: 109,
+          css: "background-image: url(https://i.pinimg.com/originals/df/6b/c8/df6bc824f295f60536e56c70ac151c27.jpg)"
         },
         {
           id: 18,
-          type: "Sides",
-          subtype: "Nigiri",
-          name: "Cool",
+          type: "Sushi",
+          subtype: "Ura maki",
+          name: "California maki",
+          bio: "Kokt kongekrabbe, avocado og sesamfrø ",
           orders: 0,
-          value: 150,
-          css: "background-image: url(https://picsum.photos/600/400)"
-        }
+          value: 125,
+          css: "background-image: url(https://img-global.cpcdn.com/recipes/0ee2ee24e36c568d/751x532cq70/california-roll-uramaki-sushi-recipe-main-photo.jpg)"
+        },
+        {
+          id: 19,
+          type: "Sushi",
+          subtype: "Ura maki",
+          name: "Hotate maki",
+          bio: "Kamskjell, chilimajones, koriander og sesamfrø",
+          orders: 0,
+          value: 109,
+          css: "background-image: url(https://www.roomservice.no/content/images/thumbs/0001687_spicy-hotate-maki_300.jpeg)"
+        },
+        {
+          id: 20,
+          type: "Sushi",
+          subtype: "Ura maki",
+          name: "Tempura",
+          bio: "Frityrstekt scampi, avocado og sesamfrø",
+          orders: 0,
+          value: 99,
+          css: "background-image: url(https://www.molinonicoli.it/upload/recipes/original/r_h_uramaki-roll-con-tempura-di-gamberi-B.jpg)"
+        },
+        {
+          id: 21,
+          type: "Sushi",
+          subtype: "Ura maki",
+          name: "Hot Philadelphia",
+          bio: "Laks, vårløk og varm Philadelphia på toppen",
+          orders: 0,
+          value: 99,
+          css: "background-image: url(https://www.rasushi.no/img/MFI_8944.jpeg)"
+        },
+        {
+          id: 22,
+          type: "Sushi",
+          subtype: "Ura maki",
+          name: "Sakura maki",
+          bio: "Laks, avocado og sesamfrø",
+          orders: 0,
+          value: 99,
+          css: "background-image: url(https://www.roomservice.no/content/images/thumbs/0001681_sakura-maki_300.jpeg)"
+        },
+        {
+          id: 23,
+          type: "Sushi",
+          subtype: "Ura maki",
+          name: "Cheesy Eel",
+          bio: "Frityrstekt maki med ål og kremost ",
+          orders: 0,
+          value: 99,
+          css: "background-image: url(https://static3.bigstockphoto.com/4/2/3/large1500/324241612.jpg)"
+        },
+        {
+          id: 24,
+          type: "Sushi",
+          subtype: "Gunkan maki",
+          name: "Ikura",
+          bio: "Lakserogn og vaktelegg",
+          orders: 0,
+          value: 99,
+          css: "background-image: url(https://img.freepik.com/free-photo/ikura-salmon-roe-sushi_38391-54.jpg?size=626&ext=jpg)"
+        },
+        {
+          id: 25,
+          type: "Sushi",
+          subtype: "Gunkan maki",
+          name: "Tobiko",
+          bio: "Flyvefiskrogn",
+          orders: 0,
+          value: 99,
+          css: "background-image: url(https://i.pinimg.com/originals/19/d0/9e/19d09e2cef475b2a1d0acffb94311320.jpg)"
+        },
+        {
+          id: 26,
+          type: "Sushi",
+          subtype: "Gunkan maki",
+          name: "Sake",
+          bio: "Spicy laks og agurk",
+          orders: 0,
+          value: 99,
+          css: "background-image: url(https://media-cdn.tripadvisor.com/media/photo-s/0f/71/51/3c/gunkan-maki.jpg)"
+        },
+        {
+          id: 27,
+          type: "Sushi",
+          subtype: "Gunkan maki",
+          name: "Maguro",
+          bio: "Spicy tuna og agurk",
+          orders: 0,
+          value: 109,
+          css: "background-image: url(https://static2.bigstockphoto.com/3/2/2/large1500/223320037.jpg)"
+        },
+        {
+          id: 28,
+          type: "Sushi",
+          subtype: "Sashimi",
+          name: "Maguro",
+          bio: "Lettrøkt kveite med soya-løkbasert saus og gojibær",
+          orders: 0,
+          value: 189,
+          css: "background-image: url(https://static2.bigstockphoto.com/3/2/2/large1500/223320037.jpg)"
+        },
+        {
+          id: 29,
+          type: "Sushi",
+          subtype: "Sashimi",
+          name: "Maguro",
+          bio: "Yellowtail og svart kaviar med orientalsk saus",
+          orders: 0,
+          value: 189,
+          css: "background-image: url(https://static2.bigstockphoto.com/3/2/2/large1500/223320037.jpg)"
+        },
+        {
+          id: 30,
+          type: "Sushi",
+          subtype: "Sashimi",
+          name: "Maguro",
+          bio: "Laks med yuzu-pepperolje og wasabirømme",
+          orders: 0,
+          value: 169,
+          css: "background-image: url(https://static2.bigstockphoto.com/3/2/2/large1500/223320037.jpg)"
+        },
+        {
+          id: 31,
+          type: "Sushi",
+          subtype: "Sashimi",
+          name: "Maguro",
+          bio: "Tunfisk i trøffelsoyaolje",
+          orders: 0,
+          value: 189,
+          css: "background-image: url(https://static2.bigstockphoto.com/3/2/2/large1500/223320037.jpg)"
+        },
+        {
+          id: 32,
+          type: "Sushi",
+          subtype: "Sashimi",
+          name: "Maguro",
+          bio: "Yellowtail med shisopesto og ingefærponzu",
+          orders: 0,
+          value: 179,
+          css: "background-image: url(https://static2.bigstockphoto.com/3/2/2/large1500/223320037.jpg)"
+        },
+        {
+          id: 33,
+          type: "Sushi",
+          subtype: "Sashimi",
+          name: "Maguro",
+          bio: "Laks med honning og mangodressing",
+          orders: 0,
+          value: 169,
+          css: "background-image: url(https://static2.bigstockphoto.com/3/2/2/large1500/223320037.jpg)"
+        },
+        {
+          id: 34,
+          type: "Sushi",
+          subtype: "Sashimi",
+          name: "Maguro",
+          bio: "Torched» kamskjell med trøffelponzu og yuzukoshomajones",
+          orders: 0,
+          value: 179,
+          css: "background-image: url(https://static2.bigstockphoto.com/3/2/2/large1500/223320037.jpg)"
+        },
+        {
+          id: 35,
+          type: "Sushi",
+          subtype: "Sashimi",
+          name: "Maguro",
+          bio: "Seks Østers - Serveres med tre ulike sauser",
+          orders: 0,
+          value: 239,
+          css: "background-image: url(https://images-global.nhst.tech/image/eDF3WjNDV1dOekpiZUsvMUxscTYvQT09/nhst/binary/2f1846f60d2201c4388a51f05d180d53)"
+        },
+        {
+          id: 36,
+          type: "Drinks",
+          subtype: "none",
+          name: "Harry & David",
+          bio: "White wine. Delight your favorite wine lover with a pair of Harry & David",
+          orders: 0,
+          value: 239,
+          css: "background-image: url(https://cdn1.harryanddavid.com/wcsstore/HarryAndDavid/images/catalog/17_29296_30E_01e_v1x.jpg)"
+        },
+        {
+          id: 37,
+          type: "Drinks",
+          subtype: "none",
+          name: "Santa Marina White Medium Sweet",
+          bio: "A fruity Medium Sweet White wine made from Cyprus Xynisteri grapes, carefully chosen to give a vibrant refreshing White wine, to please every palate.",
+          orders: 0,
+          value: 239,
+          css: "background-image: url(https://kamanterena.com.cy/wp-content/uploads/2017/04/smwhite2017.jpg)"
+        },
+        {
+          id: 38,
+          type: "Drinks",
+          subtype: "none",
+          name: "Farm hand Chardonnay",
+          bio: "Farm Hand Chardonnay is a well-balanced white wine with aromas of citrus, sweet nectarine and underlying creamy notes.",
+          orders: 0,
+          value: 239,
+          css: "background-image: url(https://edgmedia.bws.com.au/bws/media/products/661320-1.png?impolicy=Prod_MD)"
+        },
+        {
+          id: 39,
+          type: "Drinks",
+          subtype: "none",
+          name: "Champagne Pierre Jouet Belle Epoque 2008",
+          bio: "Translucent gold of radiant clarity with fresh, subtle glints of green.",
+          orders: 0,
+          value: 239,
+          css: "background-image: url(https://wines4fun.com/1350-large_default/champagne-pierre-jouet-belle-epoque.jpg)"
+        },
+        {
+          id: 40,
+          type: "Drinks",
+          subtype: "none",
+          name: "Cuvée Brut Rosé",
+          bio: "This enticing Champagne, with its pink-copper colour is a guarantee of tenderness and harmony. ",
+          orders: 0,
+          value: 239,
+          css: "background-image: url(https://www.avenuedesvins.fr/10171-large_adv_default/champagne-champagne-champagne-collet-brut.jpg)"
+        },
+        {
+          id: 41,
+          type: "Drinks",
+          subtype: "none",
+          name: "Rihaku Junmaï Ginjo",
+          bio: "Long finish with subtle notes of fruits and a nice minerality. Rihaku Shuzo brewery uses the excellent Yamadanishiki sake rice for its production",
+          orders: 0,
+          value: 239,
+          css: "background-image: url(https://www.midorinoshima.com/2223-thickbox_default/sake-rihaku-junmai-ginjo.jpg)"
+        },
+        {
+          id: 42,
+          type: "Drinks",
+          subtype: "none",
+          name: "Sake Bit",
+          bio: "Fruity sake on smaller bottles",
+          orders: 0,
+          value: 120,
+          css: "background-image: url(https://keyassets.timeincuk.net/inspirewp/live/wp-content/uploads/sites/34/2019/11/Sake-Unsplash-920x609.gif)"
+        },
+        {
+          id: 43,
+          type: "Sides",
+          subtype: "none",
+          name: "Beef Onigiri",
+          bio: "Rice balls with beef inside",
+          orders: 0,
+          value: 40,
+          css: "background-image: url(https://i.pinimg.com/736x/b0/cd/51/b0cd5133c12f78a630e17d5c7a2a6f16.jpg)"
+        },
+        {
+          id: 44,
+          type: "Sides",
+          subtype: "none",
+          name: "Onigiri Rice balls",
+          bio: "4 pieces of rice balls",
+          orders: 0,
+          value: 30,
+          css: "background-image: url(https://ak6.picdn.net/shutterstock/videos/12878936/thumb/4.jpg)"
+        },
+        {
+          id: 45,
+          type: "Sides",
+          subtype: "none",
+          name: "Tentsuyu: Tempura Dipping Sauce",
+          bio: "4 pieces of fried shrimp",
+          orders: 0,
+          value: 50,
+          css: "background-image: url(https://img.grouponcdn.com/seocms/3AVeeitHSy14D4mq21ASxnp4pxyT/hero_jpeg-1080x648)"
+        },
       ]
     };
   },
@@ -761,553 +1328,962 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.st0 {
-  fill: #f9f9fa;
-}
-.st1 {
-  fill: #504d4c;
-}
-.st2 {
-  fill: #fefefe;
-}
-.st3 {
-  fill: #010101;
-}
-.st4 {
-  fill: #313030;
-}
-
-.st5 {
-  fill: #edebec;
-}
-.st6 {
-  fill: #d5d3d3;
-}
-.st7 {
-  fill: #f68d4f;
-}
-.st8 {
-  fill: #e76e24;
-}
-.st9 {
-  fill: #010101;
-}
-
-.st10 {
-  fill: #a9bae0;
-}
-.st11 {
-  fill: #3951a3;
-  stroke: #000000;
-  stroke-width: 3.4;
-  stroke-miterlimit: 10;
-}
-.st12 {
-  fill: #010101;
-}
-
-#smileSVG {
-  width: 50%;
-}
-
-.quote {
-  color: white;
-  margin-bottom: 13em;
-  margin-top: 13em;
-}
-
-.circle {
-  margin-top: 30px;
-  width: 3em;
-  position: sticky;
-  top: 1em;
-  left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  z-index: 7;
-  opacity: 0.5;
-}
-
-#name {
-  position: sticky;
-  top: 55px;
-  z-index: 7;
-  font-size: 0.5em;
-  color: white;
-  letter-spacing: 4px;
-  cursor: pointer;
-  transition: 0.4s ease-out;
-}
-#name:hover {
-  letter-spacing: 1px;
-  transform: scale(2);
-}
-button {
-  margin: 2em;
-}
-.redPoint {
-  float: right;
-  background-color: white;
-  height: 30px;
-  width: 30px;
-  margin: auto;
-  margin-top: 30px;
-  margin-right: 30px;
-  transition: 0.4s ease-out;
-  opacity: 0.5;
-}
-
-.menu .grid {
-  width: 100%;
-  overflow: scroll;
-  overflow-x: hidden;
-  height: 100%;
-}
-.menu {
-  position: fixed;
-  z-index: 10;
-  top: 0px;
-  right: 0px;
-  width: 20px;
-  height: 100vh;
-  background-color: rgba(139, 34, 34, 0.822);
-  cursor: pointer;
-  transition: 0.4s ease-out;
-}
-.open {
-  width: 400px;
-  opacity: 1;
-  background-color: rgb(255, 255, 255);
-  top: -7px;
-}
-
-.open .redPoint {
-  background-color: black;
-  width: 30px;
-  height: 10px;
-}
-
-.redPoint:hover {
-  opacity: 1;
-}
-.redPoint:focus {
-  width: 60px;
-}
-
-ul {
-  color: black;
-  padding-top: 100px;
-  text-align: left;
-}
-
-li {
-  display: block;
-}
-
-#two {
-  margin: 0em;
-  opacity: 0.4;
-  top: 40vh;
-  position: absolute;
-  text-align: right;
-  font-size: 9em;
-  color: white;
-  right: -3em;
-  cursor: pointer;
-  transition: 0.8s ease-in-out;
-  z-index: 1;
-}
-
-#two:hover {
-  right: -2em;
-}
-
-#two:active {
-  right: 0em;
-}
-
-#one {
-  top: 10vh;
-  margin: 0em;
-  position: absolute;
-  text-align: left;
-  font-size: 9em;
-  color: white;
-  left: -4.2em;
-  cursor: pointer;
-  transition: 0.8s ease-in-out;
-}
-
-#one:hover {
-  left: -2.5em;
-}
-
-#one:active {
-  left: 0em;
-  /*width: 5em;*/
-}
-
-.entry {
-  position: relative;
-  display: grid;
-  grid-template-rows: 1fr 3em;
-  height: 13em;
-  transition: 0.4s ease-out;
-  cursor: pointer;
-  overflow: hidden;
-}
-
-.entry:hover {
-  opacity: 1;
-  color: black;
-}
-
-.entry:active {
-  opacity: 1;
-  transform: scale(0.95);
-  border-radius: 1em;
-}
-
-.entry:hover .info {
-  clip-path: circle(200% at 0% 50%);
-}
-
-.info {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  clip-path: circle(0% at 0% 50%);
-  color: black;
-  position: absolute;
-  top: 0em;
-  left: 0em;
-  background-color: white;
-  text-align: left;
-  height: 100%;
-  padding-right: 2em;
-  padding-top: 0em;
-  padding-bottom: 1em;
-  transition: 0.8s ease-in-out;
-}
-
-.info p {
-  margin-top: 1em;
-}
-
-.info_icon {
-  background: rgba(0, 0, 0, 0.205);
-  grid-row: span 4;
-  margin-right: 2em;
-}
-
-.entry .counter {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5em;
-}
-
-.counter {
-  width: 1.5em;
-  height: 1.5em;
-  border-radius: 50%;
-  background-color: red;
-  border: #ffffff4f solid;
-  color: white;
-  z-index: 40;
-  overflow: hidden;
-}
-
-.counter input {
-  margin-top: 0.3em;
-  margin-left: -0.1em;
-}
-
-input:focus {
-  outline: #42b98300;
-}
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type="number"] {
-  -moz-appearance: textfield;
-  width: 2em;
-  background-color: #42b98300;
-  border: rgba(255, 255, 255, 0);
-  color: white;
-  text-align: center;
-}
-
-.container {
-  opacity: 0.4;
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
-  grid-row-gap: 5vh;
-  margin-top: 3em;
-  border-radius: 1em;
-  background-color: black;
-  overflow: hidden;
-  z-index: 3;
-  transition: 0.4s ease-in-out;
-}
-
-.container:hover {
-  opacity: 1;
-}
-
-.image {
-  color: white;
-  background-color: aquamarine;
-  background-size: cover;
-  transition: 0.4s ease-out;
-  cursor: pointer;
-}
-.textContainer {
-  background-color: white;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-p {
-  margin: 0em;
-}
-.shape {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 5em;
-  height: 5em;
-  background-color: red;
-  margin: auto;
-  margin-top: 40vh;
-  border-radius: 1em;
-  cursor: pointer;
-  transition: 0.4s ease-out;
-  position: relative;
-  z-index: 2;
-}
-
-.shape:hover {
-  border-radius: 50%;
-  background-color: blue;
-  transform: scale(2);
-}
-.shape:active {
-  width: 10em;
-  border-radius: 2em;
-  background-color: pink;
-  transform: scale(2);
-}
-
-.categories {
-  color: rgb(61, 9, 9);
-  position: relative;
-  border-radius: 2em;
-  width: 100%;
-  background-color: white;
-  z-index: 8;
-  overflow: hidden;
-  font-weight: bold;
-}
-
-.main {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  margin-top: 3em;
-}
-
-.sub {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  background-color: pink;
-}
-
-.categories > div {
-  overflow: hidden;
-  cursor: pointer;
-  padding: 2em;
-  position: relative;
-  z-index: 3;
-  letter-spacing: 3px;
-  transition: 0.4s ease-out;
-}
-
-.categories > div:hover {
-  letter-spacing: 0px;
-  transform: scale(1.2);
-}
-
-.categories div:hover .icon {
-  border-radius: 50%;
-  background-color: rgb(255, 117, 117);
-}
-
-#selector {
-  margin-top: -3.9em;
-  grid-column: span 3;
-  z-index: 2;
-}
-
-.sub #selector {
-  grid-column: span 4;
-}
-
-.categories .icon {
-  height: 2em;
-  width: 2em;
-  background-color: rgba(0, 0, 0, 0.301);
-  margin-bottom: 1em;
-  margin: auto;
-  transition: 0.4s ease-in-out;
-}
-
-.categories svg {
-  width: 2.8em;
-  margin-bottom: -2.5em;
-}
-
-.categories > #selector,
-.categories > #selector:hover {
-  position: relative;
-  padding: 0em;
-}
-
-#triangle {
-  background-color: rgb(0, 0, 0);
-  height: 4em;
-  width: calc(100% / 3);
-  -webkit-clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-  transition: 0.8s ease-in-out;
-}
-
-.sub #triangle {
-  width: calc(100% / 4);
-}
-
-.main #triangle.active {
-  background-color: pink;
-}
-
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  margin: 0px;
-}
-li {
-  display: block;
-  padding: 1.5em;
-  margin-top: 0px;
-  width: 100%;
-  height: 20px;
-  transition: 0.4s ease-out;
-}
-li:hover {
-  background-color: black;
-  color: white;
-}
-a {
-  color: #42b983;
-}
-
-.slide-enter-active {
-  animation: slide-in 0.5s;
-  animation-fill-mode: both;
-}
-
-.down-leave-active {
-  animation: slide-up 0.5s;
-  animation-direction: reverse;
-}
-
-.down-enter-active {
-  animation: slide-up 0.5s;
-}
-
-.slide-leave-active {
-  animation: opacity 0.5s;
-}
-
-.categories .active {
-  opacity: 1;
-}
-
-.list-enter-active {
-  animation: slide-in2 0.5s;
-  animation-fill-mode: both;
-}
-
-.list-leave-active {
-  animation: opacity 0.5s;
-}
-
-.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-@keyframes slide-in {
-  0% {
-    transform: translate(15em);
-    opacity: 0;
-    height: 0em;
+  .st0 {
+    fill: #f9f9fa;
   }
-  100% {
-    transform: translate(0);
+  .st1 {
+    fill: #504d4c;
+  }
+  .st2 {
+    fill: #fefefe;
+  }
+  .st3 {
+    fill: #010101;
+  }
+  .st4 {
+    fill: #313030;
+  }
+
+  .st5 {
+    fill: #edebec;
+  }
+  .st6 {
+    fill: #d5d3d3;
+  }
+  .st7 {
+    fill: #f68d4f;
+  }
+  .st8 {
+    fill: #e76e24;
+  }
+  .st9 {
+    fill: #010101;
+  }
+
+  .st10 {
+    fill: #a9bae0;
+  }
+  .st11 {
+    fill: #3951a3;
+    stroke: #000000;
+    stroke-width: 3.4;
+    stroke-miterlimit: 10;
+  }
+  .st12 {
+    fill: #010101;
+  }
+
+  .st13{fill:#EDEBEC;}
+  .st14{fill:none;stroke:#231F20;stroke-width:1.51;stroke-linecap:round;stroke-miterlimit:10;}
+  .st15{fill:#E76E24;}
+  .st16{fill:#231F20;}
+  .st17{fill:#010101;}
+  .st18{fill:#56BB6E;}
+  .st19{fill:none;stroke:#231F20;stroke-width:1.51;stroke-miterlimit:10;}
+
+  .st20{fill:#231F20;}
+  .st21{fill:#E76E24;stroke:#231F20;stroke-miterlimit:10;stroke-width:2;}
+  .st22{fill:#E76E24;}
+
+  .st23{fill:#E76E24;}
+  .st24{fill:#F68D4F;}
+  .st25{fill:#231F20;}
+  .st26{fill:none;stroke:#231F20;stroke-width:1.68;stroke-miterlimit:10;}
+  .st27{fill:none;stroke:#231F20;stroke-width:1.68;stroke-linecap:round;stroke-miterlimit:10;}
+
+  #smileSVG {
+    width: 50%;
+  }
+
+  .profileBar {
+    display: grid;
+    grid-template-columns: 1fr;
+    padding-left: 1em;
+    padding-right: 1em;
+    opacity: .1;
+    transition: .4s;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .profileBar:hover {
+    letter-spacing: 3px;
     opacity: 1;
+  }
+
+  .profileBar:active {
+    letter-spacing: 6px;
+  }
+
+  .profileBar:hover .ball {
+    background: pink;
+    border-radius: 50%;
+  }
+
+  .profileBar:active .ball {
+    background: red;
+    width: 10em;
+    border-radius: .5em;
+  }
+
+  .profileBar .ball {
+    border-radius: 1em;
+    width: 5em;
     height: 5em;
+    background: blue;
+    margin: auto;
+    margin-bottom: 1em;
+    margin-top: 3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .4s;
   }
-}
 
-@keyframes slide-in2 {
-  0% {
-    transform: translateY(15em);
-    opacity: 0;
+  .payBar {
+    position: relative;
+    z-index: 12;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    position: fixed;
+    align-items: center;
+    bottom: 0em;
+    right: 0em;
+    background: white;
+    padding: 0em;
+    max-width: 100%;
+    width: 25em;
   }
-  100% {
-    transform: translateY(0);
+
+  .payBar p {
+    padding: 1em;
+    padding-left: 0em;
+    padding-right: 0em;
+    transition: .4s ease-out;
+  }
+
+  .payBar p:nth-of-type(1) {
+    font-size: 1.5em;
+    font-weight: bold;
+    letter-spacing: 2px;
+    height: 1em;
+  }
+
+  .payBar p:nth-of-type(2) {
+    color: white;
+    background: gray;
+    text-align: center;
+    opacity: .7;
+    padding: 1.6em;
+    cursor: pointer;
+  }
+
+  .payBar p:nth-of-type(2):hover {
+    background: blue;
+    letter-spacing: 3px;
     opacity: 1;
   }
-}
 
-@keyframes opacity {
-  0% {
-    transform: translateY(0em);
-    height: none;
-    padding: none;
+  .payBar p:nth-of-type(2):active{
+    letter-spacing: 22px;
+    background-color: pink;
   }
-  100% {
-    transform: translateY(10em);
-    height: 0em;
-    padding: 0;
-  }
-}
 
-@keyframes slide-up {
-  0% {
-    height: 0em;
-  }
-  100% {
-    height: 7.5em;
-  }
-}
-
-@media only screen and (max-width: 510px) {
-  .open {
-    width: 100vw;
-  }
-  h1,
-  h2 {
-    font-size: 4em;
+  .payBar p:nth-of-type(3) {
     display: none;
   }
-}
+
+  .quote {
+    color: white;
+    margin-bottom: 13em;
+    margin-top: 13em;
+  }
+
+  .circle {
+    margin-top: 30px;
+    width: 3em;
+    position: sticky;
+    top: 1em;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 7;
+    opacity: 0.5;
+  }
+
+  #name {
+    position: sticky;
+    top: 55px;
+    z-index: 7;
+    font-size: 0.5em;
+    color: white;
+    letter-spacing: 4px;
+    cursor: pointer;
+    transition: 0.4s ease-out;
+  }
+  #name:hover {
+    letter-spacing: 1px;
+    transform: scale(2);
+  }
+  button {
+    margin: 2em;
+  }
+
+  .menu .grid {
+    width: 100%;
+    overflow: scroll;
+    overflow-x: hidden;
+    height: 100vh;
+    width: 400px;
+    padding-top: 4em;
+    opacity: 1;
+    background-color: rgb(255, 255, 255);
+    top: -7px;
+  }
+  .menu {
+    position: fixed;
+    z-index: 10;
+    top: 0px;
+    right: 0px;
+    min-height: 4em;
+    min-width: 4em;
+    transition: 0.4s ease-out;
+  }
+s
+  .open {
+    width: 400px;
+    opacity: 1;
+    top: -7px;
+  }
+
+  .menu .container {
+    padding-left:2em;
+    padding-right:2em;
+  }
+
+  .menu .counter {
+    float: right;
+    margin-right: -.5em;
+    margin-top: -.5em;
+    font-size: .9em;
+  }
+
+  .menu .counter p {
+  }
+
+  .open .counter {
+    opacity: 0;
+  }
+
+  .burger {
+    position: absolute;
+    top: 1.5em;
+    right: 1.5em;
+    z-index: 12;
+    cursor: pointer;
+    background-color: white;
+    height: 30px;
+    width: 30px;
+    transition: 0.4s ease-out;
+    opacity: 0.5;
+  }
+
+  .open .burger {
+    background-color: black;
+    width: 30px;
+    height: 10px;
+  }
+
+  .burger:hover {
+    opacity: 1;
+  }
+  .burger:focus {
+    width: 60px;
+  }
+
+  ul {
+    color: black;
+    padding-top: 100px;
+    text-align: left;
+  }
+
+  li {
+    display: block;
+    cursor: pointer;
+  }
+
+  #two {
+    margin: 0em;
+    opacity: 0.4;
+    top: 40vh;
+    position: absolute;
+    text-align: right;
+    font-size: 9em;
+    color: white;
+    right: -3em;
+    cursor: pointer;
+    transition: 0.8s ease-in-out;
+    z-index: 1;
+  }
+
+  #two:hover {
+    right: -2em;
+  }
+
+  #two:active {
+    right: 0em;
+  }
+
+  #one {
+    top: 10vh;
+    margin: 0em;
+    position: absolute;
+    text-align: left;
+    font-size: 9em;
+    color: white;
+    left: -4.2em;
+    cursor: pointer;
+    transition: 0.8s ease-in-out;
+  }
+
+  #one:hover {
+    left: -2.5em;
+  }
+
+  #one:active {
+    left: 0em;
+    /*width: 5em;*/
+  }
+
+  .invisible--interact {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 7fr 1fr;
+    z-index: 12;
+  }
+
+  .invisible--interact div:nth-of-type(2) {
+    transition: .4s;
+    opacity: .4;
+  }
+
+  .invisible--interact div:nth-of-type(2):hover {
+    background: red;
+  }
+
+  .list__entry {
+    position: relative;
+    grid-column: span 3;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto;
+    background: gray;
+    width: 100%;
+    border-radius: 1em;
+    cursor: pointer;
+    opacity: .4;
+    text-align: left;
+    transition: .4s;
+  }
+
+  .list__entry .counter {
+    position: absolute;
+    top: -1em;
+    left: -1em;
+  }
+
+  .list__entry:hover {
+    opacity: 1;
+  }
+
+  .list__entry .content{
+    position: relative;
+    z-index: 3;
+    background: white;
+    padding: 1em;
+    border-radius: 1em;
+    width: 100%;
+    box-sizing: border-box;
+    transition: .4s ease-out;
+  }
+
+  .list__entry .list__open {
+    border-bottom-left-radius: 0em;
+  }
+
+  .list__entry > p{
+    border-radius: 1em;
+    box-sizing: border-box;
+    color: white;
+    padding: 1em;
+    text-align: right;
+    width: 100%;
+    transition: .4s;
+  }
+
+  .list__entry > p:hover {
+    background: red;
+  }
+
+  .list__entry:hover .content {
+    width: 140%;
+  }
+
+  .list__entry .list_info p {
+    margin-top: 2em;
+    margin-left: 4em;
+    width: 70%;
+  }
+
+  .list__entry .list_info {
+    height: 0em;
+    grid-column: span 2;
+    background: white;
+    border-bottom-left-radius: 1em;
+    border-bottom-right-radius: 1em;
+    display: grid;
+    overflow: hidden;
+    grid-template-columns: 2fr 1fr;
+    transition: .4s ease-out;
+  }
+
+  .list__entry:hover .list_info {
+    height: 10em;
+  }
+
+  .entry {
+    position: relative;
+    display: grid;
+    grid-template-rows: 1fr 3em;
+    height: 13em;
+    transition: 0.4s ease-out;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  .entry:hover {
+    opacity: 1;
+    color: black;
+  }
+
+  .entry:active {
+    opacity: 1;
+    transform: scale(0.95);
+    border-radius: 1em;
+  }
+
+  .entry:hover .info {
+    clip-path: circle(200% at 0% 50%);
+  }
+
+  .info {
+    clip-path: circle(0% at 0% 50%);
+    color: black;
+    position: absolute;
+    top: 0em;
+    left: 0em;
+    background-color: white;
+    text-align: left;
+    height: 100%;
+    width: 100%;
+    transition: 0.8s ease-in-out;
+  }
+
+  .info > div {
+    width: 70%;
+    margin: auto;
+  }
+
+  .info p {
+    margin-top: 1em;
+  }
+
+  .info div p:nth-of-type(2) {
+    font-size: 6em;
+    font-weight: bold;
+    float: right;
+    opacity: .04;
+    bottom: 0em;
+    right: 0em;
+    position: absolute;
+  }
+
+  .entry .counter {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5em;
+  }
+
+  .counter {
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    background-color: red;
+    border: #ffffff4f solid;
+    color: white;
+    z-index: 40;
+    overflow: hidden;
+    transition: .4s;
+  }
+
+  .counter input {
+    margin-top: 0.3em;
+    margin-left: -0.1em;
+  }
+
+  input:focus {
+    outline: #42b98300;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+    width: 2em;
+    background-color: #42b98300;
+    border: rgba(255, 255, 255, 0);
+    color: white;
+    text-align: center;
+  }
+
+  .container {
+    opacity: 1;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
+    grid-row-gap: 5vh;
+    margin-top: 3em;
+    border-radius: 1em;
+    overflow: hidden;
+    z-index: 3;
+    transition: 0.4s ease-in-out;
+  }
+
+  .container:hover {
+    opacity: 1;
+  }
+
+  .containerList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
+    grid-row-gap: 2vh;
+    margin-top: 1.7em;
+    z-index: 3;
+    transition: 0.4s ease-in-out;
+  }
+
+  .image {
+    color: white;
+    background-color: aquamarine;
+    background-size: cover;
+    background-position: center;
+    transition: 0.4s ease-out;
+    cursor: pointer;
+  }
+  .textContainer {
+    background-color: white;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  p {
+    margin: 0em;
+  }
+  .shape {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 5em;
+    height: 5em;
+    background-color: red;
+    margin: auto;
+    margin-top: 40vh;
+    border-radius: 1em;
+    cursor: pointer;
+    transition: 0.4s ease-out;
+    position: relative;
+    z-index: 2;
+  }
+
+  .shape:hover {
+    border-radius: 50%;
+    background-color: blue;
+    transform: scale(2);
+  }
+  .shape:active {
+    width: 10em;
+    border-radius: 2em;
+    background-color: pink;
+    transform: scale(2);
+  }
+
+  .categories {
+    color: rgb(61, 9, 9);
+    position: relative;
+    border-radius: 2em;
+    width: 100%;
+    background-color: white;
+    z-index: 8;
+    overflow: hidden;
+    font-weight: bold;
+  }
+
+  .categories > p {
+    height: 0em;
+    text-align: center;
+    padding: 0em;
+    opacity: 0;
+    grid-column: span 4;
+    cursor: pointer;
+    transition: .4s;
+  }
+
+  .categories > p:hover {
+    letter-spacing: 6px;
+    opacity: .6;
+  }
+
+  .categories > p:active {
+    letter-spacing: 12px;
+    color: white;
+    opacity: .3;
+  }
+
+  .categories > p.openFilter {
+    padding: 1em;
+    height: 1em;
+    opacity: 1;
+  }
+
+  .categories > div {
+    transition: .4s;
+  }
+
+  .categories > div.closeFilter {
+    padding: 0em;
+    height: 0em;
+    opacity: 0;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 3em;
+  }
+
+  .sub {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background-color: pink;
+  }
+
+  .categories > div {
+    overflow: hidden;
+    cursor: pointer;
+    padding: 2em;
+    position: relative;
+    z-index: 3;
+    letter-spacing: 3px;
+    transition: 0.4s ease-out;
+  }
+
+  .categories > div:hover {
+    letter-spacing: 0px;
+    transform: scale(1.2);
+  }
+
+  .categories div:hover .icon {
+    border-radius: 50%;
+    background-color: rgb(255, 117, 117);
+  }
+
+  #selector {
+    margin-top: -3.9em;
+    grid-column: span 3;
+    z-index: 2;
+  }
+
+  .sub #selector {
+    grid-column: span 4;
+  }
+
+  .categories .icon {
+    height: 2em;
+    width: 2em;
+    background-color: rgba(0, 0, 0, 0.301);
+    margin-bottom: 1em;
+    margin: auto;
+    transition: 0.4s ease-in-out;
+  }
+
+  .categories svg {
+    width: 2.8em;
+    margin-bottom: -2.5em;
+  }
+
+  .categories > #selector,
+  .categories > #selector:hover {
+    position: relative;
+    padding: 0em;
+  }
+
+  #triangle {
+    background-color: rgb(0, 0, 0);
+    height: 4em;
+    width: calc(100% / 3);
+    -webkit-clip-path: polygon(50% 76%, 30% 100%, 70% 100%);
+    clip-path: polygon(50% 76%, 30% 100%, 70% 100%);
+    transition: 0.8s ease-in-out;
+  }
+
+  .sub #triangle {
+    width: calc(100% / 4);
+  }
+
+  .main #triangle.active {
+    background-color: pink;
+  }
+  .layout__container {
+    background: black;
+    position: fixed;
+    bottom: 1em;
+    left: 1em;
+    z-index: 7;
+    cursor: pointer;
+    padding: .5em;
+    border-radius: .5em;
+  }
+
+  .layout__container > div {
+    background: blue;
+    width: 2em;
+    height: 2em;
+    border-radius: .5em;
+  }
+
+  #layout__list {
+    background: pink;
+  }
+  #layout__images {
+    background: gray;
+  }
+
+  h3 {
+    margin: 40px 0 0;
+  }
+  ul {
+    list-style-type: none;
+    margin: 0px;
+  }
+  li {
+    display: block;
+    padding: 1.5em;
+    margin-top: 0px;
+    width: 100%;
+    height: 20px;
+    transition: 0.4s ease-out;
+  }
+  li:hover {
+    background-color: blue;
+    color: white;
+    letter-spacing: 3px;
+  }
+  li:active {
+    letter-spacing: 22px;
+    background-color: pink;
+  }
+  a {
+    color: #42b983;
+  }
+
+  .down-leave-active {
+    animation: slide-up 0.5s;
+    animation-direction: reverse;
+  }
+
+  .down-enter-active {
+    animation: slide-up 0.5s;
+  }
+
+  .slide-enter-active {
+    animation: slide-in 0.5s;
+    animation-fill-mode: both;
+  }
+
+  .slide-leave-active {
+    animation: opacity 0.5s;
+  }
+
+  .categories .active {
+    opacity: 1;
+  }
+
+  .list-enter-active {
+    animation: slide-in2 0.5s;
+    animation-fill-mode: both;
+  }
+
+  .list-leave-active {
+    animation: opacity 0.5s;
+  }
+
+  .list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .delay-leave-active {
+    animation: delay 0.1s;
+    animation-direction: reverse;
+  }
+
+  .delay-enter-active {
+    animation: delay .5s;
+    animation-delay: .5s;
+    animation-fill-mode: backwards;
+  }
+
+  .delayDetails-leave-active {
+    animation: delayDetails 0.1s;
+    animation-direction: reverse;
+  }
+
+  .delayDetails-enter-active {
+    animation: delayDetails .5s;
+    animation-delay: .5s;
+    animation-fill-mode: backwards;
+  }
+
+  .xxx-leave-active {
+    animation: delayProfile 0.1s;
+    animation-direction: reverse;
+  }
+
+  .xxx-enter-active {
+    animation: delayProfile .5s;
+    animation-delay: .5s;
+    animation-fill-mode: backwards;
+  }
+
+  .zzz-leave-active {
+    animation: slide-in-big 0.5s;
+    animation-direction: reverse;
+  }
+
+  .zzz-enter-active {
+    animation: slide-in-big .5s;
+    animation-fill-mode: backwards;
+  }
+
+  @keyframes slide-in {
+    0% {
+      transform: translate(15em);
+      opacity: 0;
+      height: 0em;
+    }
+    100% {
+      transform: translate(0);
+      opacity: 1;
+      height: 5em;
+    }
+  }
+
+  @keyframes slide-in-big {
+    0% {
+      transform: translate(25em);
+    }
+    100% {
+      transform: translate(0);
+    }
+  }
+
+  @keyframes slide-in2 {
+    0% {
+      transform: translateY(15em);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes opacity {
+    0% {
+      transform: translateY(0em);
+      height: none;
+      padding: none;
+    }
+    100% {
+      transform: translateY(10em);
+      height: 0em;
+      padding: 0;
+    }
+  }
+
+  @keyframes slide-up {
+    0% {
+      height: 0em;
+    }
+    100% {
+      height: 3em;
+    }
+  }
+
+  @keyframes delay {
+    0% {
+      height: 0em;
+      opacity: 0;
+    }
+    100% {
+      height: 4.5em;
+      opacity: 1;
+    }
+  }
+
+  @keyframes delayProfile {
+    0% {
+      height: 0em;
+      opacity: 0;
+    }
+    100% {
+      height: 7em;
+      opacity: .1;
+    }
+  }
+
+  @keyframes delayDetails {
+    0% {
+      height: 0em;
+      margin-top: 15em;
+    }
+    100% {
+      height: 13em;
+      margin-top: 3.5em;
+    }
+  }
+
+  @media only screen and (max-width: 510px) {
+    .open {
+      width: 100vw;
+    }
+    .payBar {
+      width: 100%;
+    }
+    h1,
+    h2 {
+      font-size: 4em;
+      display: none;
+    }
+  }
 </style>
